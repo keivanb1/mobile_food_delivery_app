@@ -1,7 +1,10 @@
 import CartButton from "@/components/CartButton";
 import { images, offers } from "@/constants";
+import useAuthStore from "@/store/auth.store";
 import cn from "clsx";
+import { router } from "expo-router";
 import {
+  Alert,
   FlatList,
   Image,
   Pressable,
@@ -11,10 +14,27 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import "../global.css";
-
 export default function Index() {
+  const { user, logout } = useAuthStore();
+  // console.log({ user: JSON.stringify(user, null, 2) });
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.replace("/sign-in");
+    } catch (error) {
+      console.error("Logout error:", error);
+
+      Alert.alert(
+        "Logout failed",
+        error instanceof Error ? error.message : "Something went wrong",
+      );
+    }
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-white">
+      {/* <Button title="logout" onPress={handleLogout} /> */}
       <FlatList
         showsVerticalScrollIndicator={false}
         data={offers}
@@ -70,7 +90,7 @@ export default function Index() {
               </Text>
               <TouchableOpacity className="flex flex-row items-center gap-x-1 mt-0.5">
                 <Text className="text-black font-bold font-quicksand-semibold ">
-                  keyvan bayat
+                  {user?.name}
                 </Text>
                 <Image
                   source={images.arrowDown}
