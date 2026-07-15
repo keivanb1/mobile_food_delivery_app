@@ -1,4 +1,4 @@
-import { CreateUserParams, SignInParams } from "@/type";
+import { CreateUserParams, GetMenuParams, SignInParams } from "@/type";
 import {
   Account,
   AppwriteException,
@@ -7,6 +7,7 @@ import {
   Databases,
   ID,
   Query,
+  Storage,
 } from "react-native-appwrite";
 
 export const appwriteConfig = {
@@ -14,7 +15,12 @@ export const appwriteConfig = {
   projectId: process.env.EXPO_PUBLIC_APPWRITE_PROJECT_ID!,
   platform: "com.keyvan.realstate",
   databaseId: "6a51220c003256e1fc0b",
+  bucketId: "6a54abca0004fc901daf",
   userCollectionId: "8753097894",
+  categoriesCollectionId: "8743907846",
+  menuCollectionId: "4444444444",
+  customizationsCollectionId: "9999999999",
+  menuCustomizationsCollectionId: "2222222222",
 };
 
 const client = new Client();
@@ -26,6 +32,7 @@ client
 
 export const account = new Account(client);
 export const databases = new Databases(client);
+export const storage = new Storage(client);
 export const avatars = new Avatars(client);
 
 export const logout = async (): Promise<void> => {
@@ -114,5 +121,34 @@ export const getCurrentUser = async () => {
     return currentUser.documents[0];
   } catch {
     return null;
+  }
+};
+
+export const getMenu = async ({ category, query }: GetMenuParams) => {
+  try {
+    const queries: string[] = [];
+    if (category) queries.push(Query.equal("categories", category));
+    if (query) queries.push(Query.search("name", query));
+
+    const menus = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.menuCollectionId,
+      queries,
+    );
+    return menus.documents;
+  } catch (error) {
+    throw new Error(error as string);
+  }
+};
+
+export const getCategories = async () => {
+  try {
+    const categories = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.categoriesCollectionId,
+    );
+    return categories.documents;
+  } catch (error) {
+    throw new Error(error as string);
   }
 };
