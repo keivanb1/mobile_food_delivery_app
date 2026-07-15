@@ -78,10 +78,6 @@ const Search = () => {
           !loading ? <Text>No Results</Text> : <View></View>
         }
       />
-      {/* <Button
-        title="sees"
-        onPress={() => seed().catch((error) => console.log(error))}
-      /> */}
     </SafeAreaView>
   );
 };
